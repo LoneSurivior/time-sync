@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin implements Listener {
+	String prefix = "&7[&aTime-Sync&7]&r";
 	
 	@Override
 	public void onEnable() {
@@ -27,7 +28,7 @@ public class Main extends JavaPlugin implements Listener {
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
 				sync();
-				Bukkit.broadcastMessage("Time just AutoSynced");
+				tellConsole(prefix + "Time just AutoSynced");
 			}
 		}, 0L, minute * this.getConfig().getInt("AutoSync"));
 		
@@ -48,7 +49,38 @@ public class Main extends JavaPlugin implements Listener {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(label.equalsIgnoreCase("timesync") || label.equalsIgnoreCase("ts")) {
 			if(args.length == 0) {
-				sender.sendMessage(ChatColor.DARK_RED + "Usage: /timesync <command>");
+				if(sender instanceof Player) {
+					Player player = (Player) sender;
+					if(player.hasPermission("timesync.help")) {
+						player.sendMessage(ChatColor.GRAY + "------------------");
+						player.sendMessage(ChatColor.GREEN + "Time-Sync Commands");
+						player.sendMessage(ChatColor.GRAY + "----------------");
+						if(player.hasPermission("timesync.gettime")) {
+							player.sendMessage(ChatColor.GREEN + "/ts gettime");
+						}
+						if(player.hasPermission("timesync.reload")) {
+							player.sendMessage(ChatColor.GREEN + "/ts reload");
+						}
+						if(player.hasPermission("timesync.settime")) {
+							player.sendMessage(ChatColor.GREEN + "/ts settime");
+						}
+						if(player.hasPermission("timesync.sync")) {
+							player.sendMessage(ChatColor.GREEN + "/ts sync");
+						}
+						return true;
+					} else {
+						player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+								" &4You do not have permission!"));
+					}
+				} else {
+					tellConsole(ChatColor.GRAY + "------------------");
+					tellConsole(ChatColor.GREEN + "Time-Sync Commands");
+					tellConsole(ChatColor.GRAY + "------------------");
+					tellConsole(ChatColor.GREEN + "/ts gettime");
+					tellConsole(ChatColor.GREEN + "/ts reload");
+					tellConsole(ChatColor.GREEN + "/ts settime");
+					tellConsole(ChatColor.GREEN + "/ts sync");
+				}
 			} else {
 		 		
 				if(args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
@@ -57,15 +89,18 @@ public class Main extends JavaPlugin implements Listener {
 							if(player.hasPermission("timesync.reload")) {
 							this.saveDefaultConfig();
 							this.reloadConfig();
-							player.sendMessage(ChatColor.GREEN + "TimeSync config reloaded!");
+							player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+									" &aTime-sync config reloaded!"));
 							return true; 
 						} else {
-							sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+									" &4You do not have permission!"));
 						}
 					} else {
 						this.saveDefaultConfig();
 						this.reloadConfig();
-						tellConsole(ChatColor.GREEN + "TimeSync config reloaded!");
+						tellConsole(ChatColor.translateAlternateColorCodes('&', prefix + 
+								" &aTimeSync config reloaded!"));
 					}
 				} 
 		 		
@@ -75,19 +110,21 @@ public class Main extends JavaPlugin implements Listener {
 						if(player.hasPermission("timesync.sync")) {
 							//Actual Logic
 							sync();
-							player.sendMessage("");
-							player.sendMessage(ChatColor.GREEN + "All world groups have been synced!");
+							player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+									" &aAll world groups have been synced!"));
 							//Done
 							return true; 
 						} else {
-							player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+							player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+									" &4You do not have permission!"));
 						}
 					} else {
 						//Actual Logic
 						sync();
-						tellConsole("");
-						tellConsole(ChatColor.GREEN + "Synced to: " + this.getConfig().getString("main-world"));
+						tellConsole(ChatColor.translateAlternateColorCodes('&', prefix + 
+								" &aAll world groups have been synced!"));
 						//Done
+						return true; 
 					}
 				} 
 				
@@ -96,9 +133,9 @@ public class Main extends JavaPlugin implements Listener {
 						Player player = (Player) sender;
 						if(player.hasPermission("timesync.gettime")) {
 							//Actual Logic
-							player.sendMessage("");
+							player.sendMessage(ChatColor.GRAY + "----------");
 							player.sendMessage(ChatColor.GREEN + "World Times");
-							player.sendMessage(ChatColor.GREEN + "-----------");
+							player.sendMessage(ChatColor.GRAY + "----------");
 							List<World> worlds = getServer().getWorlds();
 							for(World world : worlds) {
 								player.sendMessage(ChatColor.GREEN + world.getName() + ": " + world.getTime());
@@ -111,9 +148,9 @@ public class Main extends JavaPlugin implements Listener {
 					} else {
 						//Actual Logic
 						List<World> worlds = getServer().getWorlds();
-						tellConsole("");
+						tellConsole(ChatColor.GRAY + "----------");
 						tellConsole(ChatColor.GREEN + "World Times");
-						tellConsole(ChatColor.GREEN + "-----------");
+						tellConsole(ChatColor.GRAY + "----------");
 						for(World world : worlds) {
 							tellConsole(ChatColor.GREEN + world.getName() + ": " + world.getTime());
 						}
@@ -130,14 +167,16 @@ public class Main extends JavaPlugin implements Listener {
 									if(Integer.parseInt(args[1])>=0 && Integer.parseInt(args[1])<=24000) {
 										//Auth Complete
 										setTime(Integer.parseInt(args[1]));
-										player.sendMessage("");
-										player.sendMessage(ChatColor.GREEN + "Time of all groups set to: " + Integer.parseInt(args[1]));
+										player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+												" &aTime of all groups set to: " + Integer.parseInt(args[1])));
 										return true;
 									} else {
-										player.sendMessage(ChatColor.RED + "Time must be a number between 0 & 24000!");
+										player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+												" &cTime must be a number between 0 & 24000!"));
 									}
 								} else {
-									player.sendMessage(ChatColor.RED + "Usage: /timesync settime <time>");
+									player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+											" &cUsage: /timesync settime <time>"));
 								}
 							} else if(args.length >= 3) {
 								if(isNum(args[1]) == true && isNum(args[2]) == true) {
@@ -145,110 +184,82 @@ public class Main extends JavaPlugin implements Listener {
 										if(Integer.parseInt(args[1]) >= 1 && Integer.parseInt(args[1]) <= this.getConfig().getConfigurationSection("Groups").getKeys(false).size()) {
 											//Auth Complete
 											setGroupTime(numToGroup(Integer.parseInt(args[1])), Integer.parseInt(args[2]));
-											player.sendMessage("");
-											player.sendMessage(ChatColor.GREEN + "Time of group " + Integer.parseInt(args[1]) + " set to: " + Integer.parseInt(args[2]));
+											player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+													" &aTime of group " + Integer.parseInt(args[1]) + " set to: " + Integer.parseInt(args[2])));
 											return true;
 										} else {
-											player.sendMessage(ChatColor.RED + "Invalid Group!");
+											player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+													" &cInvalid Group!"));
 										}
 									} else {
-										player.sendMessage(ChatColor.RED + "Time must be a number between 0 & 24000!");
+										player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+												" &cTime must be a number between 0 & 24000!"));
 									}
 								} else {
-									player.sendMessage(ChatColor.RED + "Usage: /timesync settime <time>");
+									player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+											" &cUsage: /timesync settime <time>"));
 								}
 							} else {
-								player.sendMessage(ChatColor.RED + "Usage: /timesync settime <time> OR /timesync settime <group> <time>");
+								player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+										" &cUsage: /timesync settime <time> OR /timesync settime <group> <time>"));
 							}
 						} else {
-							player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+							player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+									" &4You do not have permission!"));
 						}
 					} else { //If Console
 						if(args.length == 2) {
 							if(isNum(args[1]) == true) {
 								if(Integer.parseInt(args[1])>=0 && Integer.parseInt(args[1])<=24000) {
-									if(Integer.parseInt(args[1]) >= 1 && Integer.parseInt(args[1]) <= this.getConfig().getConfigurationSection("Groups").getKeys(false).size()) {
-										//Auth Complete
-										setTime(Integer.parseInt(args[1]));
-										tellConsole("");
-										tellConsole(ChatColor.GREEN + "Time of all groups set to: " + Integer.parseInt(args[1]));
-										return true;
-									} else {
-										tellConsole(ChatColor.RED + "Invalid Group!");
-									}
-								} else {
-									tellConsole(ChatColor.RED + "Time must be a number between 0 & 24000!");
-								}
-							} else {
-								tellConsole(ChatColor.RED + "Usage: /timesync settime <time>");
-							}
-						} else if(args.length == 3) {
-							if(isNum(args[1]) == true && isNum(args[2]) == true) {
-								if(Integer.parseInt(args[2])>=0 && Integer.parseInt(args[2])<=24000) {
 									//Auth Complete
-									setGroupTime(numToGroup(Integer.parseInt(args[1])), Integer.parseInt(args[2]));
-									tellConsole("");
-									tellConsole(ChatColor.GREEN + "Time of group " + Integer.parseInt(args[1]) + " set to: " + Integer.parseInt(args[2]));
+									setTime(Integer.parseInt(args[1]));
+									tellConsole(ChatColor.translateAlternateColorCodes('&', prefix + 
+											" &aTime of all groups set to: " + Integer.parseInt(args[1])));
 									return true;
 								} else {
-									tellConsole(ChatColor.RED + "Time must be a number between 0 & 24000!");
+									tellConsole(ChatColor.translateAlternateColorCodes('&', prefix + 
+											" &cTime must be a number between 0 & 24000!"));
 								}
 							} else {
-								tellConsole(ChatColor.RED + "Usage: /timesync settime <time>");
+								tellConsole(ChatColor.translateAlternateColorCodes('&', prefix + 
+										" &cUsage: /timesync settime <time>"));
+							}
+						} else if(args.length >= 3) {
+							if(isNum(args[1]) == true && isNum(args[2]) == true) {
+								if(Integer.parseInt(args[2])>=0 && Integer.parseInt(args[2])<=24000) {
+									if(Integer.parseInt(args[1]) >= 1 && Integer.parseInt(args[1]) <= this.getConfig().getConfigurationSection("Groups").getKeys(false).size()) {
+										//Auth Complete
+										setGroupTime(numToGroup(Integer.parseInt(args[1])), Integer.parseInt(args[2]));
+										tellConsole(ChatColor.translateAlternateColorCodes('&', prefix + 
+												" &aTime of group " + Integer.parseInt(args[1]) + " set to: " + Integer.parseInt(args[2])));
+										return true;
+									} else {
+										tellConsole(ChatColor.translateAlternateColorCodes('&', prefix + 
+												" &cInvalid Group!"));
+									}
+								} else {
+									tellConsole(ChatColor.translateAlternateColorCodes('&', prefix + 
+											" &cTime must be a number between 0 & 24000!"));
+								}
+							} else {
+								tellConsole(ChatColor.translateAlternateColorCodes('&', prefix + 
+										" &cUsage: /timesync settime <time>"));
 							}
 						} else {
-							tellConsole(ChatColor.RED + "Usage: /timesync settime <time> OR /timesync settime <group> <time>");
+							tellConsole(ChatColor.translateAlternateColorCodes('&', prefix + 
+									" &cUsage: /timesync settime <time> OR /timesync settime <group> <time>"));
 						}
 					}
 				}
 				
-				else if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("?")) {
+				else {
 					if(sender instanceof Player) {
 						Player player = (Player) sender;
-						if(player.hasPermission("timesync.help")) {
-							player.sendMessage("");
-							player.sendMessage(ChatColor.GREEN + "Time-Sync Commands:");
-							player.sendMessage(ChatColor.GREEN + "-------------------");
-							if(player.hasPermission("timesync.gettime")) {
-								player.sendMessage(ChatColor.GREEN + "/timesync gettime");
-							}
-							if(player.hasPermission("timesync.help")) {
-								player.sendMessage(ChatColor.GREEN + "/timesync help");
-							}
-							if(player.hasPermission("timesync.reload")) {
-								player.sendMessage(ChatColor.GREEN + "/timesync reload");
-							}
-							if(player.hasPermission("timesync.settime")) {
-								player.sendMessage(ChatColor.GREEN + "/timesync settime");
-							}
-							if(player.hasPermission("timesync.sync")) {
-								player.sendMessage(ChatColor.GREEN + "/timesync sync");
-							}
-							return true;
-						} else {
-							player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
-						}
+						player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + 
+								" &cUnknown command! Type /timesync to get a list of available commands"));
 					} else {
-						tellConsole("");
-						tellConsole(ChatColor.GREEN + "Time-Sync Commands:");
-						tellConsole(ChatColor.GREEN + "-------------------");
-						tellConsole(ChatColor.GREEN + "/timesync gettime");
-						tellConsole(ChatColor.GREEN + "/timesync help");
-						tellConsole(ChatColor.GREEN + "/timesync reload");
-						tellConsole(ChatColor.GREEN + "/timesync settime");
-						tellConsole(ChatColor.GREEN + "/timesync sync");
-					}
-					
-				} else {
-					if(sender instanceof Player) {
-						Player player = (Player) sender;
-						if(player.hasPermission("timesync.help")) {
-							player.sendMessage(ChatColor.DARK_RED + "Try: /timesync help");
-						} else {
-							player.sendMessage(ChatColor.DARK_RED + "Try: /timesync <command>");
-						}
-					} else {
-						tellConsole(ChatColor.DARK_RED + "Try: /timesync help");
+						tellConsole(ChatColor.translateAlternateColorCodes('&', prefix + 
+								" &cUnknown command! Type /timesync to get a list of available commands"));
 					}
 				}
 			}
