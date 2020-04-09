@@ -1,0 +1,14 @@
+# Create groups with a leader and follower worlds
+# Each group follows its own time schedule where follower worlds 
+# will sync their time up to the leader world in that group.
+# Groups like Group1 can be named anything but please make sure that the names of worlds are correct
+
+Groups:
+  Group1:
+    leader: world
+    followers:
+      - world_nether
+      - world_the_end
+      
+# How often in minutes you would like the server to automatically sync time
+AutoSync: 5
