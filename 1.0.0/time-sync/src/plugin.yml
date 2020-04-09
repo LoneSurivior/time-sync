@@ -1,0 +1,11 @@
+main: me.JaxonLeake.TimeSync.Main
+name: time-sync
+version: Alpha 1.3.0
+author: JaxonLeake
+api-version: 1.15
+
+commands:
+  sync:
+  gettime:
+  settime:
+  setmainworld:
