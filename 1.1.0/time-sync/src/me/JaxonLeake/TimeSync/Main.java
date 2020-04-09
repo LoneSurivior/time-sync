@@ -52,9 +52,9 @@ public class Main extends JavaPlugin implements Listener {
 				if(sender instanceof Player) {
 					Player player = (Player) sender;
 					if(player.hasPermission("timesync.help")) {
-						player.sendMessage(ChatColor.GRAY + "------------------");
+						player.sendMessage(ChatColor.GRAY + "-----------------");
 						player.sendMessage(ChatColor.GREEN + "Time-Sync Commands");
-						player.sendMessage(ChatColor.GRAY + "----------------");
+						player.sendMessage(ChatColor.GRAY + "-----------------");
 						if(player.hasPermission("timesync.gettime")) {
 							player.sendMessage(ChatColor.GREEN + "/ts gettime");
 						}
@@ -73,9 +73,9 @@ public class Main extends JavaPlugin implements Listener {
 								" &4You do not have permission!"));
 					}
 				} else {
-					tellConsole(ChatColor.GRAY + "------------------");
+					tellConsole(ChatColor.GRAY + "-----------------");
 					tellConsole(ChatColor.GREEN + "Time-Sync Commands");
-					tellConsole(ChatColor.GRAY + "------------------");
+					tellConsole(ChatColor.GRAY + "-----------------");
 					tellConsole(ChatColor.GREEN + "/ts gettime");
 					tellConsole(ChatColor.GREEN + "/ts reload");
 					tellConsole(ChatColor.GREEN + "/ts settime");
