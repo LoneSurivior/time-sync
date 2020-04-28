@@ -1,0 +1,9 @@
+main: me.JaxonLeake.TimeSync.Main
+name: time-sync
+version: 1.1.0
+author: JaxonLeake
+api-version: 1.15
+
+commands:
+  ts:
+  timesync:
